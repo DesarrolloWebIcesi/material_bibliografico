@@ -1,9 +1,9 @@
 <?php
-//Esta clase contiene todas las funciones usadas para crear los casos en Mantis con la informaciÛn de los formularios de adquisiciÛn de material bibliogr·fico de la Biblioteca
+//Esta clase contiene todas las funciones usadas para crear los casos en Mantis con la informaci√≥n de los formularios de adquisici√≥n de material bibliogr√°fico de la Biblioteca
 
 include_once('bd_mysql.inc');
 include_once('GeneradorCorreos.inc');
-//Clase de conexiÛn a Oracle
+//Clase de conexi√≥n a Oracle
 include_once("Conexion.inc");
 
 class Mantis{
@@ -39,12 +39,12 @@ class Mantis{
   private $serviciosOperacionalesCasoMantis; 		//DES Servicios
   private $serviciosDesarrolloCasoMantis;			//OPE Servicios
   private $causasCasoMantis;						//DES Causa
-  private $departamentoAcademicoCasoMantis;			//BIB Departamentos AcadÈmicos
+  private $departamentoAcademicoCasoMantis;			//BIB Departamentos Acad√©micos
   private $serviciosinfraestructuraCasoMantis;		//INF Servicios
   private $aplicacionesInfraestructuraCasoMantis;	//INF Aplicaciones
   private $conectividadCasoMantis;					//INF Conectividad
   private $hardwareCasoMantis;						//INF Hardware
-  private $condicionesPrestacionCasoMantis;			//Condiciones de PrestaciÛn
+  private $condicionesPrestacionCasoMantis;			//Condiciones de Prestaci√≥n
   private $condicionesEntregaCasoMantis;			//Condiciones de Entrega
   private $servicioProcesosCasoMantis;				//PRO Servicios
   
@@ -52,7 +52,7 @@ class Mantis{
   *@deprecated
   *Autor:	damanzano
   *Fecha;	27-jul-10
-  *DescripciÛn:	Este atributo se reemplaza por $fechaAcordadCasoMantis y $horaAcordadaCasoMantis debido a cambios en el SGS
+  *Descripci√≥n:	Este atributo se reemplaza por $fechaAcordadCasoMantis y $horaAcordadaCasoMantis debido a cambios en el SGS
   */
   private $fechaHoraAcordadaCasoMantis;
   private $tiempoResolucionCasoMantis;
@@ -61,7 +61,7 @@ class Mantis{
   /**
   *Autor:		damanzano
   *Fecha:		27-jul-10
-  *DescripciÛn:	Estos dos atributos se agregan como reemplazo del atributio $fechaHoraAcordaCasoMantis. 
+  *Descripci√≥n:	Estos dos atributos se agregan como reemplazo del atributio $fechaHoraAcordaCasoMantis. 
   *Este cambio se realiza debido a cambios realizados en el SGS
   */
   private $fechaAcordadaCasoMantis;
@@ -69,15 +69,15 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     Cosntructor de la clase Mantis
-   PropÛsito:  Configurar los parametros inicioales de la Clase Mantis.
+   Prop√≥sito:  Configurar los parametros inicioales de la Clase Mantis.
    Entradas:   Ninguna.
    Salida:     Ninguna.
    
    Revisiones:
-   Ver        Fecha        Autor            DescripciÛn
+   Ver        Fecha        Autor            Descripci√≥n
    ---------  -----------  ---------------  ------------------------------------
-   1.0        2009  	   gavarela         CreaciÛn
-   1.1		  27-jul-10    damanzano		ModificaciÛn realizada debido a cambios en el SGS
+   1.0        2009  	   gavarela         Creaci√≥n
+   1.1		  27-jul-10    damanzano		Modificaci√≥n realizada debido a cambios en el SGS
    Notas:
     27-jul-10	Se da valor por defecto a los nuevos atributos $fechaAcordadaCasoMantis y $horaAcordadaCasoMantis.     
   ********************************************************************************/
@@ -107,13 +107,13 @@ class Mantis{
     $this->ambienteDESCasoMantis = "N/A";
     $this->tipoNotaCasoMantis = 0;
     
-	//Este valor debe ser igual a $g_display_bugnote_padding en la configuraciÛn de Mantis (config_inc.php)
+	//Este valor debe ser igual a $g_display_bugnote_padding en la configuraci√≥n de Mantis (config_inc.php)
     $this->cantidadCerosHistoricoNota = 7;
     
     $this->medioCasoMantis = "SGS";
     $this->oficinaCasoMantis = "Biblioteca";
     $this->tipoGestionCasoMantis = "Solicitud";
-    $this->servicioBibliotecaCasoMantis = "ObtenciÛn y proceso tÈcnico de documentos";
+    $this->servicioBibliotecaCasoMantis = "Obtenci√≥n y proceso t√©cnico de documentos";
     $this->materialesCasoMantis = array("Libros", "Material audiovisual", "Casos o lecturas", "Suscripciones");
 	$this->modoAtencionCasoMantis = "N/A";
 	$this->serviciosOperacionalesCasoMantis = "N/A";
@@ -137,14 +137,14 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     obtenerIdUsuarioMantis
-   PropÛsito:  Busca el ID de la Base de Datos de Mantis de un usuario, basado en la cÈdula de este.
-   Entradas:   cedulaUsuario: La cÈdula se obtiene a travÈs de la sesiÛn
-   Salida:     El identificador, consecutivo, del usuario en Mantis Û NULL si no se pudo encontrar
+   Prop√≥sito:  Busca el ID de la Base de Datos de Mantis de un usuario, basado en la c√©dula de este.
+   Entradas:   cedulaUsuario: La c√©dula se obtiene a trav√©s de la sesi√≥n
+   Salida:     El identificador, consecutivo, del usuario en Mantis √≥ NULL si no se pudo encontrar
    
    Revisiones:
-   Ver        Fecha        Autor            DescripciÛn
+   Ver        Fecha        Autor            Descripci√≥n
    ---------  -----------  ---------------  ------------------------------------
-   1.0        11-FEB-2010  gavarela         CreaciÛn
+   1.0        11-FEB-2010  gavarela         Creaci√≥n
 
    Notas:
          
@@ -165,37 +165,37 @@ class Mantis{
   
    /*******************************************************************************
    Nombre:     crearCasoMantis
-   PropÛsito:  Inserta los datos ingresados en la Base de Datos de Mantis para crear el caso.
-   Entradas:   datosSolicitud     : cadena que contiene la descripciÛn del caso a ingresar a Mantis
+   Prop√≥sito:  Inserta los datos ingresados en la Base de Datos de Mantis para crear el caso.
+   Entradas:   datosSolicitud     : cadena que contiene la descripci√≥n del caso a ingresar a Mantis
    Salida:     El identificador, consecutivo, del caso que se crea en Mantis
-               -1 si no se pudo crear el caso por alg˙n error de conexiÛn o datos
+               -1 si no se pudo crear el caso por alg√∫n error de conexi√≥n o datos
 			   -2 si el solicitante no tiene usuario en Mantis para que quede como Informador
    
    Revisiones:
-   Ver        Fecha       Autor            DescripciÛn
+   Ver        Fecha       Autor            Descripci√≥n
    ---------  ----------  ---------------  ------------------------------------
-   1.0        04-sep-09   gavarela         CreaciÛn
-   1.1		  27-jul-10	  damanzano        ModificaciÛn necesaria para que no se envien inserten los campos N/A
+   1.0        04-sep-09   gavarela         Creaci√≥n
+   1.1		  27-jul-10	  damanzano        Modificaci√≥n necesaria para que no se envien inserten los campos N/A
    1.2		  30-jul-10   damanzano		   Se cambia el id del encargado por el id del informador en los inserts de la tabla mantis_bug_history_table	
    1.3		  11-feb-13	  jdholguin		   Se quita el reemplazo de comilla simple en el asunto del formulario para que pueda insertar correctamente en la base de datos.
    Notas:
-    27-jul-10	Se realiza una modificaciÛn para que no se hagan un insert de los campos personalizados que no sean necesarios (inicialmente se ingresaban como N/A).
-				Esta modiciaaciÛn se realiza con el fin de modificar la aplicaciÛn cada vez que se ingrese un nuevo campo personalizado en el mantins del SGS.
+    27-jul-10	Se realiza una modificaci√≥n para que no se hagan un insert de los campos personalizados que no sean necesarios (inicialmente se ingresaban como N/A).
+				Esta modiciaaci√≥n se realiza con el fin de modificar la aplicaci√≥n cada vez que se ingrese un nuevo campo personalizado en el mantins del SGS.
 				
-	30-jul-10	Se realizÛ la maodificaciÛn en la revisÛn 1.2 para que en el histÛrico del caso quede el informador y no el encargado, como el modificador de los campos.
-	12-oct-10	Se realizÛ una modificaciÛn para eliminar las comillas simples ingresadas por los usuarios en algunos campos.
+	30-jul-10	Se realiz√≥ la maodificaci√≥n en la revis√≥n 1.2 para que en el hist√≥rico del caso quede el informador y no el encargado, como el modificador de los campos.
+	12-oct-10	Se realiz√≥ una modificaci√≥n para eliminar las comillas simples ingresadas por los usuarios en algunos campos.
   ********************************************************************************/
   function crearCasoMantis($datosSolicitud){
 	$idInformadorMantis = $this->obtenerIdUsuarioMantis($_SESSION['idUsuario']);
 	$idEncargadoMantis = $this->obtenerIdUsuarioMantis($this->cedulaEncargadoMantis);
 	
-	//Si el usuario encargado no est· registrado en la Base de Datos de Mantis, se cancela la creaciÛn del caso.
+	//Si el usuario encargado no est√° registrado en la Base de Datos de Mantis, se cancela la creaci√≥n del caso.
 	if (is_null($idEncargadoMantis)){
 	  return -1;
 	  die;
 	}
 	
-	//Si el usuario solicitante no est· registrado en la Base de Datos de Mantis, se cancela la creaciÛn del caso.
+	//Si el usuario solicitante no est√° registrado en la Base de Datos de Mantis, se cancela la creaci√≥n del caso.
 	if (is_null($idInformadorMantis)){
 	  return -2;
 	  die;
@@ -308,7 +308,7 @@ class Mantis{
     }
 	
     if($resultado){
-      //Se envÌa un correo al usuario de Mantis que queda encargado del caso creado
+      //Se env√≠a un correo al usuario de Mantis que queda encargado del caso creado
 	  $sql = "SELECT email FROM mantis_user_table WHERE id=".$idEncargadoMantis;
 	  $resultado = $bd->ejecutarSQL($sql);
       $fila = $bd->sigRegistroArreglo($resultado, 0);
@@ -327,15 +327,15 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     agregarNotaCasoMantis
-   PropÛsito:  Inserta los datos ingresados en la Base de Datos de Mantis para agregar una nota a un caso.
-   Entradas:   idCasoMantis: identificador, consecutivo, del caso de Mantis al que se le agregar· la nota.
+   Prop√≥sito:  Inserta los datos ingresados en la Base de Datos de Mantis para agregar una nota a un caso.
+   Entradas:   idCasoMantis: identificador, consecutivo, del caso de Mantis al que se le agregar√° la nota.
                datosNota : cadena que contiene la nota a agregar
    Salida:     Ninguna
    
    Revisiones:
-   Ver        Fecha       Autor            DescripciÛn
+   Ver        Fecha       Autor            Descripci√≥n
    ---------  ----------  ---------------  ------------------------------------
-   1.0        11-sep-09   gavarela         CreaciÛn
+   1.0        11-sep-09   gavarela         Creaci√≥n
 
    Notas:
          
@@ -365,7 +365,7 @@ class Mantis{
         $sql = str_replace("%id_usuario_mantis%", $idEncargadoMantis, $sql);
         $sql = str_replace("%id_caso%", $idCasoMantis, $sql);
 		
-		//Se agregan ceros a la izquierda del ID de la nota ya que Mantis lo hace al agregarlo en el histÛrico
+		//Se agregan ceros a la izquierda del ID de la nota ya que Mantis lo hace al agregarlo en el hist√≥rico
 		$idNota = str_pad(mysql_insert_id(), $this->cantidadCerosHistoricoNota, '0', STR_PAD_LEFT);
 		$sql = str_replace("%id_nota%", $idNota, $sql);
         
@@ -377,15 +377,15 @@ class Mantis{
   
      /*******************************************************************************
    Nombre:     obtenerValoresLista
-   PropÛsito:  Obtiene los valores de una opciÛn que sea del tipo "ComboBox" o "Lista de Valores" de Mantis, 
-               que estÈn registrados en la Base de Datos.
+   Prop√≥sito:  Obtiene los valores de una opci√≥n que sea del tipo "ComboBox" o "Lista de Valores" de Mantis, 
+               que est√©n registrados en la Base de Datos.
    Entradas:   idCampo: Id del campo de la Base de Datos de Mantis que tiene los valores a consultar.
    Salida:     Un arreglo de string con los valores para retornar
    
    Revisiones:
-   Ver        Fecha        Autor            DescripciÛn
+   Ver        Fecha        Autor            Descripci√≥n
    ---------  -----------  ---------------  ------------------------------------
-   1.0        11-FEB-2010  gavarela         CreaciÛn
+   1.0        11-FEB-2010  gavarela         Creaci√≥n
 
    Notas:
          
@@ -406,15 +406,15 @@ class Mantis{
   
    /*******************************************************************************
    Nombre:     obtenerNombreCampo
-   PropÛsito:  Obtiene el nombre de un campo de Mantis, seg˙n el cÛdigo del campo dado
-   Entradas:   codigoCampo: CÛdigo del campo de Mantis en la Base de Datos de Mantis.
+   Prop√≥sito:  Obtiene el nombre de un campo de Mantis, seg√∫n el c√≥digo del campo dado
+   Entradas:   codigoCampo: C√≥digo del campo de Mantis en la Base de Datos de Mantis.
                bd: un objeto para consultar la Base de Datos de Mantis.
    Salida:     Un String con el nombre del campo solicitado
    
    Revisiones:
-   Ver        Fecha        Autor            DescripciÛn
+   Ver        Fecha        Autor            Descripci√≥n
    ---------  -----------  ---------------  ------------------------------------
-   1.0        17-FEB-2010  gavarela         CreaciÛn
+   1.0        17-FEB-2010  gavarela         Creaci√≥n
 
    Notas:
          El link de la base de datos no se cierra, para que pueda seguir siendo usado.
@@ -431,18 +431,18 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     obtenerCedulaEncargadoCasoMantis
-   PropÛsito:  Obtiene la cÈdula, o el nombre de usuario, registrado en TBAS_CONSTANTES del usuario que estar·
-               encargado de los casos creados para las solicitudes de material bibliogr·fico.
+   Prop√≥sito:  Obtiene la c√©dula, o el nombre de usuario, registrado en TBAS_CONSTANTES del usuario que estar√°
+               encargado de los casos creados para las solicitudes de material bibliogr√°fico.
    Entradas:   NInguna
-   Salida:     CÈdula, o el nombre de usuario, el usuario que estar· encargado de los casos
+   Salida:     C√©dula, o el nombre de usuario, el usuario que estar√° encargado de los casos
    
    Revisiones:
-   Ver        Fecha        Autor            DescripciÛn
+   Ver        Fecha        Autor            Descripci√≥n
    ---------  -----------  ---------------  ------------------------------------
-   1.0        17-FEB-2010  gavarela         CreaciÛn
+   1.0        17-FEB-2010  gavarela         Creaci√≥n
 
    Notas:
-         El cÛdigo de la constante es 175
+         El c√≥digo de la constante es 175
   ********************************************************************************/
   function obtenerCedulaEncargadoCasoMantis() {
 	//return '1130608864';

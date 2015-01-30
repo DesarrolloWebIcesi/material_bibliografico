@@ -1,0 +1,629 @@
+﻿/*******************************************************************************
+Nombre:     validarLogin
+Propósito:  Valida los campos de Nombre de usuario y Contraseña del formulario de login.
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si ambos campos tienen datos, false si al menos uno de los campos está vacío
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+Las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarLogin() {
+	var resultado = true;
+	resultado = resultado && verificarCampo(document.login.usuario, 'Nombre de usuario');
+	if (resultado) {
+		resultado = resultado && verificarCampo(document.login.password, 'Contraseña');
+	}
+	return resultado;
+}
+
+/*******************************************************************************
+Nombre:     validarISBN
+Propósito:  Valida que el valor del campo ISBN, que se pasa como parámetro, sea un código ISBN válido.
+Inicialmente la longitud de este código era de 10, pero desde el 1 de enero de 2007 se aumentó a 13, por lo que se encuentran ISBNs con 10 ó 13 dígitos
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+Entradas:   campo       : el elemento input del formulario que tiene el ISBN
+nombreCampo : el nombre del campo que se va a mostrar al usuario si el valor del campo no es válido
+Salida:     true si el valor del campo es válido, false en caso contrario
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+
+ ********************************************************************************/
+function validarISBN(campo, nombreCampo) {
+	if (campo.value != "") {
+		if (campo.value.length <= 13 && campo.value.length > 1) {
+			//Se valida que la primera parte sea un valor entero
+			var cadena = campo.value.substring(0, campo.value.length - 1);
+			var filtro = /(^\d+$)/;
+			var ultimoDigito = campo.value.charAt(campo.value.length - 1);
+			if (filtro.test(cadena) && (ultimoDigito.toUpperCase() == "X" || filtro.test(ultimoDigito))) {
+				//Se valida que el número sea mayor que cero
+				if (((Math.abs(cadena) == cadena) && Math.abs(cadena) > 0)) {
+					return true;
+				}
+			}
+		}
+		alert("El campo " + nombreCampo + " no es un ISBN válido\nDebe ser un número entero de mínimo 2 y máximo 13 dígitos, mayor a cero\nSólo el último dígito puede ser X");
+		campo.focus();
+		campo.select();
+		return false;
+	}
+	return true;
+}
+
+/*******************************************************************************
+Nombre:     validarMayorCero
+Propósito:  Valida que el valor del campo que se pasa como parámetro, sea mayor que cero.
+Se hizo esta función aparte, ya que se necesitaba mostrar un mensaje diferente al usuario y no se quería modificar las funciones propias de Web.
+Entradas:   campo       : el elemento input del formulario que se quiere validar
+nombreCampo : el nombre del campo que se va a mostrar al usuario si el valor del campo no es válido
+Salida:     true si el valor del campo es válido, false en caso contrario
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+
+ ********************************************************************************/
+function validarMayorCero(campo, nombreCampo) {
+	if ((Math.abs(campo.value) != campo.value) || campo.value == 0) {
+		alert("El campo " + nombreCampo + " debe ser mayor a cero (0)");
+		campo.focus();
+		campo.select();
+		return false;
+	}
+	return true;
+}
+
+/*******************************************************************************
+Nombre:     validarFormularioLibro
+Propósito:  Valida los campos del formulario de adquisición de libros.
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si todos campos tienen datos válidos, false si al menos uno de los campos está vacío o es inválido
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+2.0        21-feb-2011 damanzano		modificaciones realizadas para validar nuevas regglas de los formularios 
+
+Notas:
+Algunas de las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarFormularioLibro() {
+	var resultado = true;
+	resultado = resultado && verificarCampo(document.formulario.profesor, 'Profesor');
+	if (resultado) {
+		resultado = resultado && verificarCampo(document.formulario.correo_profesor, 'Correo Profesor');
+		if (resultado) {
+			resultado = resultado && isEmailAddress(document.formulario.correo_profesor, 'Correo Profesor');
+			if (resultado) {
+				resultado = resultado && verificarCampo(document.formulario.titulo, 'Título');
+				if (resultado) {
+					resultado = resultado && verificarCampo(document.formulario.autor, 'Autor');
+					if (resultado) {
+						resultado = resultado && validarISBN(document.formulario.isbn, 'ISBN');
+						if (resultado) {
+							resultado = resultado && verificarCampo(document.formulario.editorial, 'Editorial');
+							if (resultado) {
+								resultado = resultado && verificarCampo(document.formulario.fechaPublicacion, 'Año de publicación');
+								if (resultado) {
+									resultado = resultado && isInteger(document.formulario.fechaPublicacion, 'Año de publicación');
+									if (resultado) {
+										resultado = resultado && validarMayorCero(document.formulario.fechaPublicacion, 'Año de publicación');
+										if (resultado) {
+											resultado = resultado && validarMaximaFechaPublicacion(document.formulario.fechaPublicacion);
+											if (resultado) {
+												resultado = resultado && verificarCampo(document.formulario.temas, 'Temas');
+												if(document.formulario.temas!=null && document.formulario.comentarios!=""){
+													resultado = resultado && isNotNumber(document.formulario.temas, 'Temas');												
+												}							
+												if (resultado) {
+													resultado = resultado && validarMaterias();
+													if (resultado) {
+														resultado = resultado && verificarCampo(document.formulario.departamento, 'Departamento');
+														if (resultado) {
+															resultado = resultado && verificarCampo(document.formulario.programa, 'Programa responsable');
+															if (resultado) {
+																resultado = resultado && verificarGrupo(document.formulario.reserva, document.formulario.reserva.length, 'valor para el campo Reserva');
+																if (resultado) {
+																	resultado = resultado && verificarGrupo(document.formulario.urgente, document.formulario.urgente.length, 'valor para el campo Urgente');
+																	if (resultado) {
+																		resultado = resultado && verificarCampo(document.formulario.cantidad, 'Cantidad requerida');
+																		if (resultado) {
+																			resultado = resultado && isInteger(document.formulario.cantidad, 'Cantidad requerida');
+																			if (resultado) {
+																				resultado = resultado && validarMayorCero(document.formulario.cantidad, 'Cantidad requerida');																				
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return resultado;
+}
+
+/*******************************************************************************
+Nombre:     validarMaximaFechaPublicacion
+Propósito:  Valida que el valor del campo Fecha de Publicación no sea mayor a la actual
+Entradas:   campo          : el elemento input del formulario
+nombreCampo    : el nombre del campo que se va a mostrar al usuario si el valor del campo no es válido
+Salida:     true si el valor del campo es válido, false en caso contrario
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        06-oct-09   gavarela         Creación
+
+Notas:
+
+ ********************************************************************************/
+function validarMaximaFechaPublicacion(campo) {
+	var annoActual = new Date();
+	if (campo.value > annoActual.getFullYear()) {
+		alert("El año de publicación no puede ser mayor al año actual");
+		campo.focus();
+		campo.select();
+		return false;
+	}
+	return true;
+}
+
+/*******************************************************************************
+Nombre:     validarFormularioAudiovisual
+Propósito:  Valida los campos del formulario de adquisición de material audiovisual.
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si todos campos tienen datos válidos, false si al menos uno de los campos está vacío o es inválido
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        21-ago-09   gavarela         Creación
+
+Notas:
+Algunas de las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarFormularioAudiovisual() {
+	var resultado = true;
+	resultado = resultado && verificarCampo(document.formulario.profesor, 'Profesor');
+	if (resultado) {
+		resultado = resultado && verificarCampo(document.formulario.correo_profesor, 'Correo Profesor');
+		if (resultado) {
+			resultado = resultado && isEmailAddress(document.formulario.correo_profesor, 'Correo Profesor');
+			if (resultado) {
+				resultado = resultado && verificarCampo(document.formulario.titulo, 'Título');
+				if (resultado) {
+					resultado = resultado && verificarCampo(document.formulario.tipoMaterial, 'Tipo de material');
+					if (resultado) {
+						resultado = resultado && verificarCampo(document.formulario.temas, 'Temas');
+						if (resultado) {
+							resultado = resultado && validarMaterias();
+							if (resultado) {
+								resultado = resultado && verificarCampo(document.formulario.departamento, 'Departamento');
+								if (resultado) {
+									resultado = resultado && verificarCampo(document.formulario.programa, 'Programa responsable');
+									if (resultado) {
+										resultado = resultado && verificarCampo(document.formulario.cantidad, 'Cantidad requerida');
+										if (resultado) {
+											resultado = resultado && isInteger(document.formulario.cantidad, 'Cantidad requerida');
+											if (resultado) {
+												resultado = resultado && validarMayorCero(document.formulario.cantidad, 'Cantidad requerida');
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return resultado;
+}
+
+/*******************************************************************************
+Nombre:     validarFormularioCasoLectura
+Propósito:  Valida los campos del formulario de adquisición de casos y lecturas.
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si todos campos tienen datos válidos, false si al menos uno de los campos está vacío o es inválido
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        21-ago-09   gavarela         Creación
+
+Notas:
+Algunas de las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarFormularioCasoLectura() {
+	var resultado = true;
+	resultado = resultado && verificarCampo(document.formulario.profesor, 'Profesor');
+	if (resultado) {
+		resultado = resultado && verificarCampo(document.formulario.correo_profesor, 'Correo Profesor');
+		if (resultado) {
+			resultado = resultado && isEmailAddress(document.formulario.correo_profesor, 'Correo Profesor');
+			if (resultado) {
+				
+				resultado = resultado && verificarCampo(document.formulario.titulo, 'Título');
+				if (resultado) {
+					resultado = resultado && verificarCampo(document.formulario.autor, 'Autor');
+					if (resultado) {
+						resultado = resultado && verificarCampo(document.formulario.publicador, 'Publicador');
+						if (resultado) {
+							if (document.formulario.fechaPublicacion.value != "") {
+								resultado = resultado && isInteger(document.formulario.fechaPublicacion, 'Año de publicación');
+								if (resultado) {
+									resultado = resultado && validarMayorCero(document.formulario.fechaPublicacion, 'Año de publicación');
+									if (resultado) {
+										resultado = resultado && validarMaximaFechaPublicacion(document.formulario.fechaPublicacion);
+									}
+								}
+							}
+							if (resultado) {
+								resultado = resultado && verificarCampo(document.formulario.departamento, 'Departamento');
+								if (resultado) {
+									resultado = resultado && verificarCampo(document.formulario.programa, 'Programa responsable');
+									if (resultado) {
+										resultado = resultado && verificarCampo(document.formulario.cenco, 'CENCO');
+										if (resultado) {
+											resultado = resultado && isInteger(document.formulario.cenco, 'CENCO');
+											if (resultado) {
+												resultado = resultado && validarMayorCero(document.formulario.cenco, 'CENCO');
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return resultado;
+}
+
+/*******************************************************************************
+Nombre:     validarFormularioSuscripcion
+Propósito:  Valida los campos del formulario de adquisición de suscripciones.
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si todos campos tienen datos válidos, false si al menos uno de los campos está vacío o es inválido
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        24-ago-09   gavarela         Creación
+
+Notas:
+Algunas de las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarFormularioSuscripcion() {
+	var resultado = true;
+	resultado = resultado && verificarCampo(document.formulario.profesor, 'Profesor');
+	if (resultado) {
+		resultado = resultado && verificarCampo(document.formulario.correo_profesor, 'Correo Profesor');
+		if (resultado) {
+			resultado = resultado && isEmailAddress(document.formulario.correo_profesor, 'Correo Profesor');
+			if (resultado) {
+				resultado = resultado && verificarCampo(document.formulario.titulo, 'Título');
+				if (resultado) {
+					resultado = resultado && validarISSN(document.formulario.issn, 'ISSN');
+					if (resultado) {
+						resultado = resultado && verificarCampo(document.formulario.editorial, 'Editorial');
+						if (resultado) {
+							resultado = resultado && verificarCampo(document.formulario.temas, 'Temas');
+							if (resultado) {
+								resultado = resultado && validarMaterias();
+								if (resultado) {
+									resultado = resultado && verificarCampo(document.formulario.departamento, 'Departamento');
+									if (resultado) {
+										resultado = resultado && verificarCampo(document.formulario.programa, 'Programa responsable');
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return resultado;
+}
+
+/*******************************************************************************
+Nombre:     validarFormularioArticulo
+Propósito:  Valida los campos del formulario de adquisición de artículos.
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si todos campos tienen datos válidos, false si al menos uno de los campos está vacío o es inválido
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        2012-02-06  damanzano         Creación
+
+Notas:
+Algunas de las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarFormularioArticulo() {
+	var resultado = true;
+	resultado = resultado && verificarCampo(document.formulario.profesor, 'Profesor');
+	if (resultado) {
+		resultado = resultado && verificarCampo(document.formulario.correo_profesor, 'Correo Profesor');
+		if (resultado) {
+			resultado = resultado && isEmailAddress(document.formulario.correo_profesor, 'Correo Profesor');
+			if (resultado) {
+				resultado = resultado && verificarCampo(document.formulario.titulo_pub, 'Título de la Publicación');
+				if (resultado) {
+					resultado = resultado && verificarCampo(document.formulario.titulo_art, 'Título del artículo');
+					if (resultado) {
+						resultado = resultado && verificarCampo(document.formulario.autor, 'Autor');
+						if (resultado) {
+							resultado = resultado && verificarCampo(document.formulario.fechaPublicacion, 'Año de publicación');
+							if (resultado) {
+								resultado = resultado && isInteger(document.formulario.fechaPublicacion, 'Año de publicación');
+								if (resultado) {
+									resultado = resultado && validarMayorCero(document.formulario.fechaPublicacion, 'Año de publicación');
+									if (resultado) {
+										resultado = resultado && validarMaximaFechaPublicacion(document.formulario.fechaPublicacion);
+										if (resultado) {
+											resultado = resultado && verificarCampo(document.formulario.departamento, 'Departamento');
+											if (resultado) {
+												resultado = resultado && verificarCampo(document.formulario.programa, 'Programa responsable');
+												if (resultado) {
+													resultado = resultado && verificarCampo(document.formulario.cenco, 'CENCO');
+													if (resultado) {
+														resultado = resultado && isInteger(document.formulario.cenco, 'CENCO');
+														if (resultado) {
+															resultado = resultado && validarMayorCero(document.formulario.cenco, 'CENCO');
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return resultado;
+}
+
+/*******************************************************************************
+Nombre:     validarISSN
+Propósito:  Valida que el valor del campo ISSN, que se pasa como parámetro, sea un código ISSN válido.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+Entradas:   campo       : el elemento input del formulario que tiene el ISSN
+nombreCampo : el nombre del campo que se va a mostrar al usuario si el valor del campo no es válido
+Salida:     true si el valor del campo es válido, false en caso contrario
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        24-ago-09   gavarela         Creación
+
+Notas:
+La longitud de este código es de 8, y en ocasiones el último dígito es una X, simbolizando el 10
+ ********************************************************************************/
+function validarISSN(campo, nombreCampo) {
+	if (campo.value != "") {
+		if (campo.value.length <= 8) {
+			//Se valida que sea un valor entero
+			var cadena = campo.value.substring(0, 7);
+			var filtro = /(^\d+$)/;
+			if (filtro.test(cadena) && (campo.value.charAt(7).toUpperCase() == "X" || filtro.test(campo.value.charAt(7)))) {
+				//Se valida que el número sea mayor que cero
+				if ((Math.abs(cadena) == cadena && Math.abs(cadena) > 0)) {
+					return true;
+				}
+			}
+		}
+		alert("El campo " + nombreCampo + " no es un ISSN válido\nDebe ser un número entero de 8 dígitos mayor que cero\nSólo el último dígito puede ser X");
+		campo.focus();
+		campo.select();
+		return false;
+	}
+	return true;
+}
+
+/*******************************************************************************
+Nombre:     validarMaterias
+Propósito:  Valida los campos de las materias que el usuario haya agregado en los formularios de adquisición
+Entradas:   Ninguna. Los campos se obtienen del objeto document
+Salida:     true si todos campos tienen datos válidos, false si al menos uno de los campos está vacío o es inválido
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+Algunas de las validaciones de los campos se hacen con las funciones que Web usa en sus otros sitios.
+Para facilitar agregar y/o modificar validaciones, estas se hacen una por una y al final se retorna el resultado.
+ ********************************************************************************/
+function validarMaterias() {
+	var contadorMaterias = 1;
+	var resultado = true;
+	var nombreCampoNombre = "nombreMateria" + contadorMaterias;
+	var campoNombre = document.getElementById(nombreCampoNombre);
+	
+	/*var nombreCampoCodigo = "codigoMateria"+contadorMaterias;
+	var campoCodigo = document.getElementById(nombreCampoCodigo);
+	
+	var nombreCampoDepartamento = "departamentoMateria"+contadorMaterias;
+	var campoDepartamento = document.getElementById(nombreCampoDepartamento);*/
+	while (campoNombre) {
+		resultado = resultado && verificarCampo(campoNombre, 'Nombre de Materia');
+		/*if (resultado){
+		resultado = resultado && verificarCampo(campoCodigo, 'Código de Materia');
+		if (resultado){
+		resultado = resultado && isInteger(campoCodigo, 'Código de Materia');
+		if (resultado){
+		resultado = resultado && validarMayorCero(campoCodigo, 'Código de Materia');
+		if (resultado){
+		resultado = resultado && verificarCampo(campoDepartamento, 'Departamento de Materia');
+		}
+		}
+		}
+		}*/
+		contadorMaterias++;
+		
+		nombreCampoNombre = "nombreMateria" + contadorMaterias;
+		campoNombre = document.getElementById(nombreCampoNombre);
+		
+		/*nombreCampoCodigo = "codigoMateria"+contadorMaterias;
+		campoCodigo = document.getElementById(nombreCampoCodigo);
+		
+		nombreCampoDepartamento = "departamentoMateria"+contadorMaterias;
+		campoDepartamento = document.getElementById(nombreCampoDepartamento);*/
+	}
+	return resultado;
+}
+
+//Esta variable global guarda el número de materias que el usuario ha agregado en el formulario en que se encuetre trabajando
+var contadorFilas = 1;
+
+/*******************************************************************************
+Nombre:     setContadorFilas
+Propósito:  Asigna un valor dado a la variable global contadorFilas
+Entradas:   El valor a asignar a la variable global contadorFilas
+Salida:     Ninguna.
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+
+ ********************************************************************************/
+function setContadorFilas(nuevoValor) {
+	contadorFilas = nuevoValor;
+}
+
+/*******************************************************************************
+Nombre:     agregarFila
+Propósito:  Adiciona una fila a la tabla de información de materias del formulario usando el DOM de Javascript
+Entradas:   idTabla        : atributo id de la tabla de información de materias del formulario
+idEnlacesFilas : atributo id de la etiqueta DIV en la que van los enlaces que agregan y quitan filas de materias
+Salida:     Ninguna. El HTML se genera a través del DOM no de un return.
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+
+ ********************************************************************************/
+function agregarFila(idTabla, idEnlacesFilas) {
+	var nombreCampoNombre = "nombreMateria" + contadorFilas;
+	var campoNombre = document.getElementById(nombreCampoNombre);
+	if (verificarCampo(campoNombre, 'Nombre de Materia')) {
+		
+		contadorFilas++;
+		var tbody = document.getElementById(idTabla).getElementsByTagName("tbody")[0];
+		var fila = document.createElement("tr");
+		
+		var celdaNombre = document.createElement("td");
+		var campoNombre = document.createElement('input');
+		campoNombre.name = 'nombreMateria' + contadorFilas;
+		campoNombre.id = 'nombreMateria' + contadorFilas;
+		campoNombre.type = 'text';
+		campoNombre.size = 17;
+		campoNombre.setAttribute('maxLength', 80);
+		celdaNombre.appendChild(campoNombre);
+		
+		var celdaCodigo = document.createElement("td");
+		var campoCodigo = document.createElement('input');
+		campoCodigo.name = 'codigoMateria' + contadorFilas;
+		campoCodigo.id = 'codigoMateria' + contadorFilas;
+		campoCodigo.type = 'text';
+		campoCodigo.size = 5;
+		campoCodigo.setAttribute('maxLength', 5);
+		celdaCodigo.appendChild(campoCodigo);
+		
+		var celdaDepartamento = document.createElement("td");
+		var campoDepartamento = document.createElement('input');
+		campoDepartamento.name = 'departamentoMateria' + contadorFilas;
+		campoDepartamento.id = 'departamentoMateria' + contadorFilas;
+		campoDepartamento.type = 'text';
+		campoDepartamento.size = 17;
+		campoDepartamento.setAttribute('maxLength', 60);
+		celdaDepartamento.appendChild(campoDepartamento);
+		
+		fila.appendChild(celdaNombre);
+		fila.appendChild(celdaCodigo);
+		fila.appendChild(celdaDepartamento);
+		tbody.appendChild(fila);
+		
+		//El enlace para borrar filas aparece sólo cuando se crea la primera materia adicional
+		if (contadorFilas == 2) {
+			var enlace = document.createElement("a");
+			enlace.id = 'enlaceElimina';
+			var textoEnlace = document.createTextNode("Eliminar última materia");
+			enlace.setAttribute("href", "javascript:borrarFila('" + idTabla + "', 'enlaceElimina')");
+			enlace.setAttribute("title", "Eliminar la última materia");
+			enlace.appendChild(textoEnlace);
+			document.getElementById(idEnlacesFilas).appendChild(enlace);
+		}
+	}
+}
+
+/*******************************************************************************
+Nombre:     borrarFila
+Propósito:  Elimina la última fila de la tabla de información de materias del formulario
+Entradas:   idTabla  : atributo id de la tabla de información de materias del formulario
+idEnlace : atributo id del enlace que borra las filas
+Salida:     Ninguna. El HTML se elimina a través del DOM no de un return.
+
+Revisiones:
+Ver        Fecha       Autor            Descripción
+---------  ----------  ---------------  ------------------------------------
+1.0        20-ago-09   gavarela         Creación
+
+Notas:
+
+ ********************************************************************************/
+function borrarFila(idTabla, idEnlace) {
+	document.getElementById(idTabla).deleteRow(contadorFilas--);	
+	//El enlace para borrar filas sólo debe ser visible mientras haya más de una fila de materias
+	if (contadorFilas == 1) {
+		var enlace = document.getElementById(idEnlace);
+		enlace.parentNode.removeChild(enlace);
+	}
+}

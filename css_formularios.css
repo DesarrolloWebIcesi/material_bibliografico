@@ -1,0 +1,21 @@
+.obligatorio {
+  font-weight:bold;
+  text-align:right; }
+.opcional {
+  font-weight:normal;
+  text-align:right; }
+.error {
+  font-weight:bold;
+  color:#FF0000; }
+.autenticado td {
+  font-size: 8pt;
+  font-style: normal;
+  font-weight: normal;
+  text-align:right;
+  color: #882222;
+  background: #ffffff; }
+#content .autenticado {
+  color:#FF0000; 
+  }
+.isxn {
+  font-size:11px; }

@@ -1,9 +1,9 @@
 <?php
-//Esta clase contiene todas las funciones usadas para crear los casos en Mantis con la informaci√≥n de los formularios de adquisici√≥n de material bibliogr√°fico de la Biblioteca
+//Esta clase contiene todas las funciones usadas para crear los casos en Mantis con la informaciÛn de los formularios de adquisiciÛn de material bibliogr·fico de la Biblioteca
 
 include_once('bd_mysql.inc');
 include_once('GeneradorCorreos.inc');
-//Clase de conexi√≥n a Oracle
+//Clase de conexiÛn a Oracle
 include_once("Conexion.inc");
 
 class Mantis{
@@ -39,12 +39,12 @@ class Mantis{
   private $serviciosOperacionalesCasoMantis; 		//DES Servicios
   private $serviciosDesarrolloCasoMantis;			//OPE Servicios
   private $causasCasoMantis;						//DES Causa
-  private $departamentoAcademicoCasoMantis;			//BIB Departamentos Acad√©micos
+  private $departamentoAcademicoCasoMantis;			//BIB Departamentos AcadÈmicos
   private $serviciosinfraestructuraCasoMantis;		//INF Servicios
   private $aplicacionesInfraestructuraCasoMantis;	//INF Aplicaciones
   private $conectividadCasoMantis;					//INF Conectividad
   private $hardwareCasoMantis;						//INF Hardware
-  private $condicionesPrestacionCasoMantis;			//Condiciones de Prestaci√≥n
+  private $condicionesPrestacionCasoMantis;			//Condiciones de PrestaciÛn
   private $condicionesEntregaCasoMantis;			//Condiciones de Entrega
   private $servicioProcesosCasoMantis;				//PRO Servicios
   
@@ -52,7 +52,7 @@ class Mantis{
   *@deprecated
   *Autor:	damanzano
   *Fecha;	27-jul-10
-  *Descripci√≥n:	Este atributo se reemplaza por $fechaAcordadCasoMantis y $horaAcordadaCasoMantis debido a cambios en el SGS
+  *DescripciÛn:	Este atributo se reemplaza por $fechaAcordadCasoMantis y $horaAcordadaCasoMantis debido a cambios en el SGS
   */
   private $fechaHoraAcordadaCasoMantis;
   private $tiempoResolucionCasoMantis;
@@ -61,7 +61,7 @@ class Mantis{
   /**
   *Autor:		damanzano
   *Fecha:		27-jul-10
-  *Descripci√≥n:	Estos dos atributos se agregan como reemplazo del atributio $fechaHoraAcordaCasoMantis. 
+  *DescripciÛn:	Estos dos atributos se agregan como reemplazo del atributio $fechaHoraAcordaCasoMantis. 
   *Este cambio se realiza debido a cambios realizados en el SGS
   */
   private $fechaAcordadaCasoMantis;
@@ -69,21 +69,23 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     Cosntructor de la clase Mantis
-   Prop√≥sito:  Configurar los parametros inicioales de la Clase Mantis.
+   PropÛsito:  Configurar los parametros inicioales de la Clase Mantis.
    Entradas:   Ninguna.
    Salida:     Ninguna.
    
    Revisiones:
-   Ver        Fecha        Autor            Descripci√≥n
+   Ver        Fecha        Autor            DescripciÛn
    ---------  -----------  ---------------  ------------------------------------
-   1.0        2009  	   gavarela         Creaci√≥n
-   1.1		  27-jul-10    damanzano		Modificaci√≥n realizada debido a cambios en el SGS
+   1.0        2009  	   gavarela         CreaciÛn
+   1.1		  27-jul-10    damanzano		ModificaciÛn realizada debido a cambios en el SGS
+   1.2		  03-feb-15	   cdcriollo	    Se adiciono la clausula mysql_real_escape_string al campo departamentoAcademicoCasoMantis
    Notas:
     27-jul-10	Se da valor por defecto a los nuevos atributos $fechaAcordadaCasoMantis y $horaAcordadaCasoMantis.     
   ********************************************************************************/
   public function __construct(){
     $this->parametrosBaseDatosMantis  = array("C_DB_HOST" => "mysql.icesi.edu.co",
-						                      "C_DB_NAME" => "servicios_adm",
+						                      //"C_DB_NAME" => "servicios_adm",
+											  "C_DB_NAME" => "sgs",
 						                      "C_DB_USER" => "servicios",
 						                      "C_DB_PASS" => "MfePayDghK3",
 						                      "C_PORT" => "3306");
@@ -107,20 +109,20 @@ class Mantis{
     $this->ambienteDESCasoMantis = "N/A";
     $this->tipoNotaCasoMantis = 0;
     
-	//Este valor debe ser igual a $g_display_bugnote_padding en la configuraci√≥n de Mantis (config_inc.php)
+	//Este valor debe ser igual a $g_display_bugnote_padding en la configuraciÛn de Mantis (config_inc.php)
     $this->cantidadCerosHistoricoNota = 7;
     
     $this->medioCasoMantis = "SGS";
     $this->oficinaCasoMantis = "Biblioteca";
     $this->tipoGestionCasoMantis = "Solicitud";
-    $this->servicioBibliotecaCasoMantis = "Obtenci√≥n y proceso t√©cnico de documentos";
+    $this->servicioBibliotecaCasoMantis = "ObtenciÛn y proceso tÈcnico de documentos";
     $this->materialesCasoMantis = array("Libros", "Material audiovisual", "Casos o lecturas", "Suscripciones");
 	$this->modoAtencionCasoMantis = "N/A";
 	$this->serviciosOperacionalesCasoMantis = "N/A";
 	$this->serviciosDesarrolloCasoMantis = "N/A";
 	$this->causasCasoMantis = "N/A";
 	$this->proyectoCasoMantis = "N/A";
-	$this->departamentoAcademicoCasoMantis = utf8_decode($_POST['departamento']);
+	$this->departamentoAcademicoCasoMantis = utf8_decode(mysql_real_escape_string($_POST['departamento']));
 	$this->serviciosInfraestructuraCasoMantis = "N/A";
 	$this->aplicacionesInfraestructuraCasoMantis = "N/A";
 	$this->conectividadCasoMantis = "N/A";
@@ -137,14 +139,14 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     obtenerIdUsuarioMantis
-   Prop√≥sito:  Busca el ID de la Base de Datos de Mantis de un usuario, basado en la c√©dula de este.
-   Entradas:   cedulaUsuario: La c√©dula se obtiene a trav√©s de la sesi√≥n
-   Salida:     El identificador, consecutivo, del usuario en Mantis √≥ NULL si no se pudo encontrar
+   PropÛsito:  Busca el ID de la Base de Datos de Mantis de un usuario, basado en la cÈdula de este.
+   Entradas:   cedulaUsuario: La cÈdula se obtiene a travÈs de la sesiÛn
+   Salida:     El identificador, consecutivo, del usuario en Mantis Û NULL si no se pudo encontrar
    
    Revisiones:
-   Ver        Fecha        Autor            Descripci√≥n
+   Ver        Fecha        Autor            DescripciÛn
    ---------  -----------  ---------------  ------------------------------------
-   1.0        11-FEB-2010  gavarela         Creaci√≥n
+   1.0        11-FEB-2010  gavarela         CreaciÛn
 
    Notas:
          
@@ -165,37 +167,39 @@ class Mantis{
   
    /*******************************************************************************
    Nombre:     crearCasoMantis
-   Prop√≥sito:  Inserta los datos ingresados en la Base de Datos de Mantis para crear el caso.
-   Entradas:   datosSolicitud     : cadena que contiene la descripci√≥n del caso a ingresar a Mantis
+   PropÛsito:  Inserta los datos ingresados en la Base de Datos de Mantis para crear el caso.
+   Entradas:   datosSolicitud     : cadena que contiene la descripciÛn del caso a ingresar a Mantis
    Salida:     El identificador, consecutivo, del caso que se crea en Mantis
-               -1 si no se pudo crear el caso por alg√∫n error de conexi√≥n o datos
+               -1 si no se pudo crear el caso por alg˙n error de conexiÛn o datos
 			   -2 si el solicitante no tiene usuario en Mantis para que quede como Informador
    
    Revisiones:
-   Ver        Fecha       Autor            Descripci√≥n
+   Ver        Fecha       Autor            DescripciÛn
    ---------  ----------  ---------------  ------------------------------------
-   1.0        04-sep-09   gavarela         Creaci√≥n
-   1.1		  27-jul-10	  damanzano        Modificaci√≥n necesaria para que no se envien inserten los campos N/A
+   1.0        04-sep-09   gavarela         CreaciÛn
+   1.1		  27-jul-10	  damanzano        ModificaciÛn necesaria para que no se envien inserten los campos N/A
    1.2		  30-jul-10   damanzano		   Se cambia el id del encargado por el id del informador en los inserts de la tabla mantis_bug_history_table	
    1.3		  11-feb-13	  jdholguin		   Se quita el reemplazo de comilla simple en el asunto del formulario para que pueda insertar correctamente en la base de datos.
+   1.4        03-feb-15   cdcriollo        Se adiciono la clausula mysql_real_escape_string escapar caracteres especiales a los campos nombre_profesor, resumen caso, programa_responsable, material solicitado
+                                           segun caso se soporte  172467
    Notas:
-    27-jul-10	Se realiza una modificaci√≥n para que no se hagan un insert de los campos personalizados que no sean necesarios (inicialmente se ingresaban como N/A).
-				Esta modiciaaci√≥n se realiza con el fin de modificar la aplicaci√≥n cada vez que se ingrese un nuevo campo personalizado en el mantins del SGS.
+    27-jul-10	Se realiza una modificaciÛn para que no se hagan un insert de los campos personalizados que no sean necesarios (inicialmente se ingresaban como N/A).
+				Esta modiciaaciÛn se realiza con el fin de modificar la aplicaciÛn cada vez que se ingrese un nuevo campo personalizado en el mantins del SGS.
 				
-	30-jul-10	Se realiz√≥ la maodificaci√≥n en la revis√≥n 1.2 para que en el hist√≥rico del caso quede el informador y no el encargado, como el modificador de los campos.
-	12-oct-10	Se realiz√≥ una modificaci√≥n para eliminar las comillas simples ingresadas por los usuarios en algunos campos.
+	30-jul-10	Se realizÛ la maodificaciÛn en la revisÛn 1.2 para que en el histÛrico del caso quede el informador y no el encargado, como el modificador de los campos.
+	12-oct-10	Se realizÛ una modificaciÛn para eliminar las comillas simples ingresadas por los usuarios en algunos campos.
   ********************************************************************************/
   function crearCasoMantis($datosSolicitud){
 	$idInformadorMantis = $this->obtenerIdUsuarioMantis($_SESSION['idUsuario']);
 	$idEncargadoMantis = $this->obtenerIdUsuarioMantis($this->cedulaEncargadoMantis);
 	
-	//Si el usuario encargado no est√° registrado en la Base de Datos de Mantis, se cancela la creaci√≥n del caso.
+	//Si el usuario encargado no est· registrado en la Base de Datos de Mantis, se cancela la creaciÛn del caso.
 	if (is_null($idEncargadoMantis)){
 	  return -1;
 	  die;
 	}
 	
-	//Si el usuario solicitante no est√° registrado en la Base de Datos de Mantis, se cancela la creaci√≥n del caso.
+	//Si el usuario solicitante no est· registrado en la Base de Datos de Mantis, se cancela la creaciÛn del caso.
 	if (is_null($idInformadorMantis)){
 	  return -2;
 	  die;
@@ -227,12 +231,11 @@ class Mantis{
 	  $sql = str_replace("%id_eta%", $this->idEtaMantis, $sql);
 	  $sql = str_replace("%id_perfil%", $this->idPerfilMantis, $sql);
 	  $sql = str_replace("%id_estado_vista%", $this->idEstadoVistaMantis, $sql);
-	  $resumenCaso = substr(utf8_decode($_POST['titulo']), 0, 127);
+	  $resumenCaso = substr(utf8_decode(mysql_real_escape_string($_POST['titulo'])), 0, 127);
 	  //$resumenCaso = str_replace("'","\'",$resumenCaso);
 	  $sql = str_replace("%resumen_caso%", $resumenCaso, $sql);
 	  $sql = str_replace("%id_sponsor%", $this->idSponsorMantis, $sql);
 	  $sql = str_replace("%id_sticky%", $this->idStickyMantis, $sql);
-	  
 	  $resultado = $bd->ejecutarSQL($sql);
       $idCasoMantis = mysql_insert_id();
 	  
@@ -248,7 +251,7 @@ class Mantis{
                        (16, LAST_INSERT_ID(), '%departamento_academico%'),
 					   (31, LAST_INSERT_ID(), '%programa_responsable%'),
                        (18, LAST_INSERT_ID(), '%nombre_profesor%'),
-                       (17, LAST_INSERT_ID(), '%material_solicitado%');";
+                       (17, LAST_INSERT_ID(), '%material_solicitado%')";
         
         $sql = str_replace("%area_caso%", $this->areaCasoMantis, $sql);
         $sql = str_replace("%correo_usuario%", $_SESSION['correoUsuario'], $sql);
@@ -260,13 +263,12 @@ class Mantis{
         $sql = str_replace("%departamento_academico%", $this->departamentoAcademicoCasoMantis, $sql);
 		$sql = str_replace("%programa_responsable%", utf8_decode($_POST['programa']), $sql);
         
-        $nombre_profesor = $_SESSION['nombresUsuario']." ".$_SESSION['apellidosUsuario'];
+        $nombre_profesor = mysql_real_escape_string($_SESSION['nombresUsuario']." ".$_SESSION['apellidosUsuario']);
         $sql = str_replace("%nombre_profesor%", $nombre_profesor, $sql);
         
         $sql = str_replace("%material_solicitado%", utf8_decode($_POST['tipoSolicitud']), $sql);		
 		$sql = str_replace("%hora_acordada%", $this->horaAcordadaCasoMantis, $sql);
 		$sql = str_replace("%tiempo_resolucion%", $this->tiempoResolucionCasoMantis, $sql);		
-        
         $resultado = $bd->ejecutarSQL($sql);
         
 		if($resultado){
@@ -294,21 +296,20 @@ class Mantis{
 		  $sql = str_replace("%medio%", $this->medioCasoMantis, $sql);          
           $sql = str_replace("%servicio_biblioteca%", $this->servicioBibliotecaCasoMantis, $sql);
           $sql = str_replace("%departamento_academico%", $this->departamentoAcademicoCasoMantis, $sql);
-		  $sql = str_replace("%programa_responsable%", utf8_decode($_POST['programa']), $sql);
-          $sql = str_replace("%nombre_profesor%", $nombre_profesor, $sql);
-          $sql = str_replace("%material_solicitado%", utf8_decode($_POST['tipoSolicitud']), $sql);	  
+		  $sql = str_replace("%programa_responsable%", utf8_decode(mysql_real_escape_string($_POST['programa'])), $sql);
+          $sql = str_replace("%nombre_profesor%",$nombre_profesor, $sql);
+          $sql = str_replace("%material_solicitado%", utf8_decode(mysql_real_escape_string($_POST['tipoSolicitud'])), $sql);	  
           $sql = str_replace("%id_estado_nuevo%", $this->idEstadoNuevoMantis, $sql);
           $sql = str_replace("%id_estado_asignado%", $this->idEstadoAsignadoMantis, $sql);
           $sql = str_replace("%id_encargado_mantis%", $idEncargadoMantis, $sql);
 		  $sql = str_replace("%id_informador_mantis%", $idInformadorMantis, $sql);
-          
           $resultado= $bd->ejecutarSQL($sql);
         }
       }
     }
 	
     if($resultado){
-      //Se env√≠a un correo al usuario de Mantis que queda encargado del caso creado
+      //Se envÌa un correo al usuario de Mantis que queda encargado del caso creado
 	  $sql = "SELECT email FROM mantis_user_table WHERE id=".$idEncargadoMantis;
 	  $resultado = $bd->ejecutarSQL($sql);
       $fila = $bd->sigRegistroArreglo($resultado, 0);
@@ -327,15 +328,15 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     agregarNotaCasoMantis
-   Prop√≥sito:  Inserta los datos ingresados en la Base de Datos de Mantis para agregar una nota a un caso.
-   Entradas:   idCasoMantis: identificador, consecutivo, del caso de Mantis al que se le agregar√° la nota.
+   PropÛsito:  Inserta los datos ingresados en la Base de Datos de Mantis para agregar una nota a un caso.
+   Entradas:   idCasoMantis: identificador, consecutivo, del caso de Mantis al que se le agregar· la nota.
                datosNota : cadena que contiene la nota a agregar
    Salida:     Ninguna
    
    Revisiones:
-   Ver        Fecha       Autor            Descripci√≥n
+   Ver        Fecha       Autor            DescripciÛn
    ---------  ----------  ---------------  ------------------------------------
-   1.0        11-sep-09   gavarela         Creaci√≥n
+   1.0        11-sep-09   gavarela         CreaciÛn
 
    Notas:
          
@@ -356,7 +357,6 @@ class Mantis{
       $sql = str_replace("%id_usuario_mantis%", $idEncargadoMantis, $sql);
       $sql = str_replace("%id_estado_vista%", $this->idEstadoVistaMantis, $sql);
       $sql = str_replace("%tipo_nota%", $this->tipoNotaCasoMantis, $sql);
-      
       $resultado = $bd->ejecutarSQL($sql);
       
       if($resultado){
@@ -365,10 +365,9 @@ class Mantis{
         $sql = str_replace("%id_usuario_mantis%", $idEncargadoMantis, $sql);
         $sql = str_replace("%id_caso%", $idCasoMantis, $sql);
 		
-		//Se agregan ceros a la izquierda del ID de la nota ya que Mantis lo hace al agregarlo en el hist√≥rico
+		//Se agregan ceros a la izquierda del ID de la nota ya que Mantis lo hace al agregarlo en el histÛrico
 		$idNota = str_pad(mysql_insert_id(), $this->cantidadCerosHistoricoNota, '0', STR_PAD_LEFT);
 		$sql = str_replace("%id_nota%", $idNota, $sql);
-        
         $resultado = $bd->ejecutarSQL($sql);
       }
     }
@@ -377,15 +376,15 @@ class Mantis{
   
      /*******************************************************************************
    Nombre:     obtenerValoresLista
-   Prop√≥sito:  Obtiene los valores de una opci√≥n que sea del tipo "ComboBox" o "Lista de Valores" de Mantis, 
-               que est√©n registrados en la Base de Datos.
+   PropÛsito:  Obtiene los valores de una opciÛn que sea del tipo "ComboBox" o "Lista de Valores" de Mantis, 
+               que estÈn registrados en la Base de Datos.
    Entradas:   idCampo: Id del campo de la Base de Datos de Mantis que tiene los valores a consultar.
    Salida:     Un arreglo de string con los valores para retornar
    
    Revisiones:
-   Ver        Fecha        Autor            Descripci√≥n
+   Ver        Fecha        Autor            DescripciÛn
    ---------  -----------  ---------------  ------------------------------------
-   1.0        11-FEB-2010  gavarela         Creaci√≥n
+   1.0        11-FEB-2010  gavarela         CreaciÛn
 
    Notas:
          
@@ -406,15 +405,15 @@ class Mantis{
   
    /*******************************************************************************
    Nombre:     obtenerNombreCampo
-   Prop√≥sito:  Obtiene el nombre de un campo de Mantis, seg√∫n el c√≥digo del campo dado
-   Entradas:   codigoCampo: C√≥digo del campo de Mantis en la Base de Datos de Mantis.
+   PropÛsito:  Obtiene el nombre de un campo de Mantis, seg˙n el cÛdigo del campo dado
+   Entradas:   codigoCampo: CÛdigo del campo de Mantis en la Base de Datos de Mantis.
                bd: un objeto para consultar la Base de Datos de Mantis.
    Salida:     Un String con el nombre del campo solicitado
    
    Revisiones:
-   Ver        Fecha        Autor            Descripci√≥n
+   Ver        Fecha        Autor            DescripciÛn
    ---------  -----------  ---------------  ------------------------------------
-   1.0        17-FEB-2010  gavarela         Creaci√≥n
+   1.0        17-FEB-2010  gavarela         CreaciÛn
 
    Notas:
          El link de la base de datos no se cierra, para que pueda seguir siendo usado.
@@ -431,18 +430,18 @@ class Mantis{
   
   /*******************************************************************************
    Nombre:     obtenerCedulaEncargadoCasoMantis
-   Prop√≥sito:  Obtiene la c√©dula, o el nombre de usuario, registrado en TBAS_CONSTANTES del usuario que estar√°
-               encargado de los casos creados para las solicitudes de material bibliogr√°fico.
+   PropÛsito:  Obtiene la cÈdula, o el nombre de usuario, registrado en TBAS_CONSTANTES del usuario que estar·
+               encargado de los casos creados para las solicitudes de material bibliogr·fico.
    Entradas:   NInguna
-   Salida:     C√©dula, o el nombre de usuario, el usuario que estar√° encargado de los casos
+   Salida:     CÈdula, o el nombre de usuario, el usuario que estar· encargado de los casos
    
    Revisiones:
-   Ver        Fecha        Autor            Descripci√≥n
+   Ver        Fecha        Autor            DescripciÛn
    ---------  -----------  ---------------  ------------------------------------
-   1.0        17-FEB-2010  gavarela         Creaci√≥n
+   1.0        17-FEB-2010  gavarela         CreaciÛn
 
    Notas:
-         El c√≥digo de la constante es 175
+         El cÛdigo de la constante es 175
   ********************************************************************************/
   function obtenerCedulaEncargadoCasoMantis() {
 	//return '1130608864';

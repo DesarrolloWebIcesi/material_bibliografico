@@ -78,12 +78,14 @@ class Mantis{
    ---------  -----------  ---------------  ------------------------------------
    1.0        2009  	   gavarela         Creación
    1.1		  27-jul-10    damanzano		Modificación realizada debido a cambios en el SGS
+   1.2		  03-feb-15	   cdcriollo	    Se adiciono la clausula mysql_real_escape_string al campo departamentoAcademicoCasoMantis
    Notas:
     27-jul-10	Se da valor por defecto a los nuevos atributos $fechaAcordadaCasoMantis y $horaAcordadaCasoMantis.     
   ********************************************************************************/
   public function __construct(){
     $this->parametrosBaseDatosMantis  = array("C_DB_HOST" => "mysql.icesi.edu.co",
-						                      "C_DB_NAME" => "servicios_adm",
+						                      //"C_DB_NAME" => "servicios_adm",
+											  "C_DB_NAME" => "sgs",
 						                      "C_DB_USER" => "servicios",
 						                      "C_DB_PASS" => "MfePayDghK3",
 						                      "C_PORT" => "3306");
@@ -120,7 +122,7 @@ class Mantis{
 	$this->serviciosDesarrolloCasoMantis = "N/A";
 	$this->causasCasoMantis = "N/A";
 	$this->proyectoCasoMantis = "N/A";
-	$this->departamentoAcademicoCasoMantis = utf8_decode($_POST['departamento']);
+	$this->departamentoAcademicoCasoMantis = utf8_decode(mysql_real_escape_string($_POST['departamento']));
 	$this->serviciosInfraestructuraCasoMantis = "N/A";
 	$this->aplicacionesInfraestructuraCasoMantis = "N/A";
 	$this->conectividadCasoMantis = "N/A";
@@ -178,6 +180,8 @@ class Mantis{
    1.1		  27-jul-10	  damanzano        Modificación necesaria para que no se envien inserten los campos N/A
    1.2		  30-jul-10   damanzano		   Se cambia el id del encargado por el id del informador en los inserts de la tabla mantis_bug_history_table	
    1.3		  11-feb-13	  jdholguin		   Se quita el reemplazo de comilla simple en el asunto del formulario para que pueda insertar correctamente en la base de datos.
+   1.4        03-feb-15   cdcriollo        Se adiciono la clausula mysql_real_escape_string escapar caracteres especiales a los campos nombre_profesor, resumen caso, programa_responsable, material solicitado
+                                           segun caso se soporte  172467
    Notas:
     27-jul-10	Se realiza una modificación para que no se hagan un insert de los campos personalizados que no sean necesarios (inicialmente se ingresaban como N/A).
 				Esta modiciaación se realiza con el fin de modificar la aplicación cada vez que se ingrese un nuevo campo personalizado en el mantins del SGS.
@@ -227,12 +231,11 @@ class Mantis{
 	  $sql = str_replace("%id_eta%", $this->idEtaMantis, $sql);
 	  $sql = str_replace("%id_perfil%", $this->idPerfilMantis, $sql);
 	  $sql = str_replace("%id_estado_vista%", $this->idEstadoVistaMantis, $sql);
-	  $resumenCaso = substr(utf8_decode($_POST['titulo']), 0, 127);
+	  $resumenCaso = substr(utf8_decode(mysql_real_escape_string($_POST['titulo'])), 0, 127);
 	  //$resumenCaso = str_replace("'","\'",$resumenCaso);
 	  $sql = str_replace("%resumen_caso%", $resumenCaso, $sql);
 	  $sql = str_replace("%id_sponsor%", $this->idSponsorMantis, $sql);
 	  $sql = str_replace("%id_sticky%", $this->idStickyMantis, $sql);
-	  
 	  $resultado = $bd->ejecutarSQL($sql);
       $idCasoMantis = mysql_insert_id();
 	  
@@ -248,7 +251,7 @@ class Mantis{
                        (16, LAST_INSERT_ID(), '%departamento_academico%'),
 					   (31, LAST_INSERT_ID(), '%programa_responsable%'),
                        (18, LAST_INSERT_ID(), '%nombre_profesor%'),
-                       (17, LAST_INSERT_ID(), '%material_solicitado%');";
+                       (17, LAST_INSERT_ID(), '%material_solicitado%')";
         
         $sql = str_replace("%area_caso%", $this->areaCasoMantis, $sql);
         $sql = str_replace("%correo_usuario%", $_SESSION['correoUsuario'], $sql);
@@ -260,13 +263,12 @@ class Mantis{
         $sql = str_replace("%departamento_academico%", $this->departamentoAcademicoCasoMantis, $sql);
 		$sql = str_replace("%programa_responsable%", utf8_decode($_POST['programa']), $sql);
         
-        $nombre_profesor = $_SESSION['nombresUsuario']." ".$_SESSION['apellidosUsuario'];
+        $nombre_profesor = mysql_real_escape_string($_SESSION['nombresUsuario']." ".$_SESSION['apellidosUsuario']);
         $sql = str_replace("%nombre_profesor%", $nombre_profesor, $sql);
         
         $sql = str_replace("%material_solicitado%", utf8_decode($_POST['tipoSolicitud']), $sql);		
 		$sql = str_replace("%hora_acordada%", $this->horaAcordadaCasoMantis, $sql);
 		$sql = str_replace("%tiempo_resolucion%", $this->tiempoResolucionCasoMantis, $sql);		
-        
         $resultado = $bd->ejecutarSQL($sql);
         
 		if($resultado){
@@ -294,14 +296,13 @@ class Mantis{
 		  $sql = str_replace("%medio%", $this->medioCasoMantis, $sql);          
           $sql = str_replace("%servicio_biblioteca%", $this->servicioBibliotecaCasoMantis, $sql);
           $sql = str_replace("%departamento_academico%", $this->departamentoAcademicoCasoMantis, $sql);
-		  $sql = str_replace("%programa_responsable%", utf8_decode($_POST['programa']), $sql);
-          $sql = str_replace("%nombre_profesor%", $nombre_profesor, $sql);
-          $sql = str_replace("%material_solicitado%", utf8_decode($_POST['tipoSolicitud']), $sql);	  
+		  $sql = str_replace("%programa_responsable%", utf8_decode(mysql_real_escape_string($_POST['programa'])), $sql);
+          $sql = str_replace("%nombre_profesor%",$nombre_profesor, $sql);
+          $sql = str_replace("%material_solicitado%", utf8_decode(mysql_real_escape_string($_POST['tipoSolicitud'])), $sql);	  
           $sql = str_replace("%id_estado_nuevo%", $this->idEstadoNuevoMantis, $sql);
           $sql = str_replace("%id_estado_asignado%", $this->idEstadoAsignadoMantis, $sql);
           $sql = str_replace("%id_encargado_mantis%", $idEncargadoMantis, $sql);
 		  $sql = str_replace("%id_informador_mantis%", $idInformadorMantis, $sql);
-          
           $resultado= $bd->ejecutarSQL($sql);
         }
       }
@@ -356,7 +357,6 @@ class Mantis{
       $sql = str_replace("%id_usuario_mantis%", $idEncargadoMantis, $sql);
       $sql = str_replace("%id_estado_vista%", $this->idEstadoVistaMantis, $sql);
       $sql = str_replace("%tipo_nota%", $this->tipoNotaCasoMantis, $sql);
-      
       $resultado = $bd->ejecutarSQL($sql);
       
       if($resultado){
@@ -368,7 +368,6 @@ class Mantis{
 		//Se agregan ceros a la izquierda del ID de la nota ya que Mantis lo hace al agregarlo en el histórico
 		$idNota = str_pad(mysql_insert_id(), $this->cantidadCerosHistoricoNota, '0', STR_PAD_LEFT);
 		$sql = str_replace("%id_nota%", $idNota, $sql);
-        
         $resultado = $bd->ejecutarSQL($sql);
       }
     }
